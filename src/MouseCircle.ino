@@ -1,0 +1,115 @@
+/*
+   Move the mouse in a small circle every N minutes.
+   To keep the screensaver/screenlock from activating.
+   in environments (corp/admin lock) that don't allow disabling screenlock (!)
+
+   For teensy2
+   
+   by anon 12/6/2012
+*/
+#include "Mouse.h"
+#include <keylayouts.h>
+
+// led is pin 11
+int led = 13; 
+// e.g. 8*60000 == 8 minutes
+unsigned long msecs = 25 * 60000; 
+
+double rad=0.0;
+
+// Move the mouse in a circle.
+// R is not actually the radius--
+// I can't say exactly what it is right now, but 
+// if you give a bigger R, you get a bigger circle
+void circle(int r)  
+{
+   int delta=60;
+   rad=0;
+   double raddelta = 2*PI/delta;
+      for (int i=0;rad < 2*PI; rad+=raddelta)
+      {
+          long x = r * cos(rad);
+          long y = r * sin(rad);
+          Mouse.move(x,y);
+          delay(5);
+      }
+}
+
+void moveRandom(int speedfactor){
+  int delta = random(5) - 2;
+  rad = rad + .08 * delta;
+  Mouse.move( speedfactor * cos(rad), speedfactor * sin(rad));
+}
+
+void flashLed(long dur){
+    digitalWrite(led, HIGH);   // flash the led
+    delay(dur);
+    digitalWrite(led, LOW);
+}
+
+// this just keeps getting called, over and over, by the framework
+void circleLoop() 
+{
+    if (millis() > (15L * 60000)) return ;  // 15 minutes
+    flashLed(2000);    
+    circle(3);                // move it  
+    // Keyboard.print(" Jinxer ");  // a little malice
+    //Serial.println(msecs);    // log it 
+    delay(msecs);             // wait til next time
+}
+
+void randomLoop(){
+  moveRandom(3);
+  delay(20);
+}
+
+void runCommand(const char * cmd) {
+  Keyboard.set_modifier(MODIFIERKEY_GUI);
+  Keyboard.set_key1(KEY_R);
+  Keyboard.send_now();
+  flashLed(200);
+  Keyboard.println(cmd);
+}
+
+void sendAlt(int key){
+  Keyboard.set_modifier(MODIFIERKEY_ALT);
+  Keyboard.set_key1(key);
+  Keyboard.send_now();
+  flashLed(100);
+}
+
+void setNotePadFont(int siz){
+  sendAlt( KEY_O);
+  sendAlt( KEY_F);
+  sendAlt( KEY_S);
+  flashLed(300);
+  Keyboard.println(siz);
+}
+
+void aBitOfMalice(){
+   runCommand("notepad");
+   flashLed(500);
+   setNotePadFont(24);
+   Keyboard.println("# This is a test.");
+   Keyboard.println("rm -rf /");
+   sendAlt(KEY_F);
+   sendAlt(KEY_A);
+   sendAlt(KEY_N);
+   flashLed(800);
+   Keyboard.print("autoexecc.bat");
+}
+
+// this is called once, first, by the framework
+void setup() 
+{ 
+   pinMode(led, OUTPUT);  // led
+   randomSeed( analogRead(1));
+   flashLed(3000);
+}
+
+void loop(){
+  circleLoop();
+  //randomLoop();
+  
+}
+
