@@ -3,10 +3,11 @@
    To keep the screensaver/screenlock from activating.
    in environments (corp/admin lock) that don't allow disabling screenlock (!)
 
-   For teensy2
+   For teensy2 or digispark-tiny
    
    by anon 12/6/2012
 */
+#include <Arduino.h>
 
 #ifdef ARDUINO_AVR_DIGISPARK
 #include <DigiMouse.h>
@@ -71,6 +72,8 @@ void setup()
 	// nothing necessary
 #endif
 	delay(2000);
+
+   circle( radius);    // start with a circle
 
 }
 
