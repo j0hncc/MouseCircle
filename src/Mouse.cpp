@@ -4,7 +4,9 @@
    in environments (corp/admin lock) that don't allow disabling screenlock (!)
 
    For teensy2 or digispark-tiny
-   
+      e.g. ~/source/MouseCircle$ pio run -e digispark-tiny -t upload
+      jcc 7/26/2026
+      
    by anon 12/6/2012
 */
 #include <Arduino.h>
